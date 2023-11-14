@@ -1,10 +1,13 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import Home from './components/Home';
-import Cadastro from './components/Cadastro';
-import Listagem from './components/Listagem';
-import Favoritos from './components/Favoritos';
+import { Home } from './pages/Home';
+import { Cadastro } from './pages/Cadastro';
+import { Listagem } from './pages/Listagem';
+import { Favoritos } from './pages/Favoritos';
+import { createTables } from './lib/sqlite/queries';
+
+createTables();
 
 const Tab = createBottomTabNavigator();
 

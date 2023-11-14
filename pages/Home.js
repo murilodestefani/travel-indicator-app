@@ -1,6 +1,6 @@
 import { View, Text, ImageBackground } from 'react-native';
 
-export default function Home() {
+export function Home() {
 	return (
 		<View className='flex-1'>
 			<ImageBackground

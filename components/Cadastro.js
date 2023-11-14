@@ -5,17 +5,16 @@ import {
 	TextInput,
 	FlatList,
 	TouchableOpacity,
+	Switch,
 } from 'react-native';
 import { openDatabase } from 'expo-sqlite';
 
-const db = openDatabase({
-	name: 'rn_sqlite',
-});
+const db = openDatabase('rn_sqlite');
 
 const createTables = () => {
 	db.transaction((txn) => {
 		txn.executeSql(
-			`CREATE TABLE IF NOT EXISTS locais (id INTEGER PRIMARY KEY AUTOINCREMENTO, nome TEXT, data TEXT, descricao TEXT, despesa REAL, url TEXT, favorito NUMERIC)`,
+			`CREATE TABLE IF NOT EXISTS locais (id INTEGER PRIMARY KEY AUTOINCREMENT, nome VARCHAR(50), data TEXT, descricao TEXT, despesa FLOAT, url TEXT, favorito BOOLEAN)`,
 			[],
 			(sqlTxn, res) => {
 				console.log('Tabela criada com sucesso');
@@ -33,14 +32,18 @@ export default function Cadastro() {
 	const [descricao, setDescricao] = useState('');
 	const [despesa, setDespesa] = useState('');
 	const [url, setUrl] = useState('');
-	// const [favorito, setFavorito] = useState(0);
+	const [favorito, setFavorito] = useState(false);
 	const [locais, setLocais] = useState([]);
+
+	const onToggleSwitch = () => {
+		setFavorito((previousState) => !previousState);
+	};
 
 	const limparCampos = () => {
 		setNome('');
 		setData('');
 		setDescricao('');
-		setDespesa(0);
+		setDespesa('');
 		setUrl('');
 		setFavorito(false);
 	};
@@ -54,7 +57,7 @@ export default function Cadastro() {
 		db.transaction((txn) => {
 			txn.executeSql(
 				`INSERT INTO locais (nome, data, descricao, despesa, url, favorito) VALUES (?, ?, ?, ?, ?, ?)`,
-				[nome, data, descricao, despesa, url, 0],
+				[nome, data, descricao, despesa, url, favorito],
 				(sqlTxn, res) => {
 					console.log(`${nome} adicionado com sucesso`);
 					getLocais();
@@ -62,7 +65,7 @@ export default function Cadastro() {
 				},
 				(error) => {
 					console.log(
-						`Nome: ${nome} | Data: ${data} | Descrição: ${descricao} | Despesa: ${despesa} | Url: ${url} | Favorito: 0`
+						`Nome: ${nome} | Data: ${data} | Descrição: ${descricao} | Despesa: ${despesa} | Url: ${url} | Favorito: ${favorito}`
 					);
 					console.log('Erro na inserção do local ' + error.message);
 				}
@@ -145,15 +148,10 @@ export default function Cadastro() {
 				keyboardType='default'
 				returnKeyType='next'
 			/>
-			{/* <Text className='font-bold text-lg text-slate-800'>Favorito</Text>
-			<TextInput
-				className='border-2 rounded-lg border-slate-800'
-				value={favorito}
-				onChangeText={setFavorito}
-				placeholder='local é favorito?'
-				keyboardType='default'
-				returnKeyType='done'
-			/> */}
+			<Text className='font-bold text-lg text-slate-800'>Favorito</Text>
+			<View className='flex-1 items-start'>
+				<Switch onValueChange={onToggleSwitch} value={favorito} />
+			</View>
 
 			<TouchableOpacity
 				onPress={addLocal}

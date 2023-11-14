@@ -1,20 +1,42 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
+import Home from './components/Home';
+import Cadastro from './components/Cadastro';
+import Listagem from './components/Listagem';
+import Favoritos from './components/Favoritos';
+
+const Tab = createBottomTabNavigator();
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+	return (
+		<NavigationContainer>
+			<Tab.Navigator
+				screenOptions={({ route }) => ({
+					tabBarIcon: ({ focused, color, size }) => {
+						let iconName;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+						if (route.name === 'Home') {
+							iconName = focused ? 'ios-home' : 'ios-home-outline';
+						} else if (route.name === 'Cadastro') {
+							iconName = focused ? 'ios-add-circle' : 'ios-add-circle-outline';
+						} else if (route.name === 'Listagem') {
+							iconName = focused
+								? 'ios-list-circle'
+								: 'ios-list-circle-outline';
+						} else if (route.name === 'Favoritos') {
+							iconName = focused ? 'ios-heart' : 'ios-heart-outline';
+						}
+
+						return <Ionicons name={iconName} size={size} color={color} />;
+					},
+				})}
+			>
+				<Tab.Screen name='Home' component={Home} />
+				<Tab.Screen name='Cadastro' component={Cadastro} />
+				<Tab.Screen name='Listagem' component={Listagem} />
+				<Tab.Screen name='Favoritos' component={Favoritos} />
+			</Tab.Navigator>
+		</NavigationContainer>
+	);
+}

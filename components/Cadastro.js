@@ -3,11 +3,29 @@ import {
 	View,
 	Text,
 	TextInput,
-	Switch,
-	TouchableOpacity,
 	FlatList,
+	TouchableOpacity,
 } from 'react-native';
-import { createTables, addLocal, getLocais } from './database';
+import { openDatabase } from 'expo-sqlite';
+
+const db = openDatabase({
+	name: 'rn_sqlite',
+});
+
+const createTables = () => {
+	db.transaction((txn) => {
+		txn.executeSql(
+			`CREATE TABLE IF NOT EXISTS locais (id INTEGER PRIMARY KEY AUTOINCREMENTO, nome TEXT, data TEXT, descricao TEXT, despesa REAL, url TEXT, favorito NUMERIC)`,
+			[],
+			(sqlTxn, res) => {
+				console.log('Tabela criada com sucesso');
+			},
+			(error) => {
+				console.log('Erro ao criar a tabela ' + error.message);
+			}
+		);
+	});
+};
 
 export default function Cadastro() {
 	const [nome, setNome] = useState('');
@@ -15,17 +33,8 @@ export default function Cadastro() {
 	const [descricao, setDescricao] = useState('');
 	const [despesa, setDespesa] = useState('');
 	const [url, setUrl] = useState('');
-	const [favorito, setFavorito] = useState(false);
+	// const [favorito, setFavorito] = useState(0);
 	const [locais, setLocais] = useState([]);
-
-	useEffect(() => {
-		createTables();
-		getLocais();
-	}, []);
-
-	const onToggleSwitch = () => {
-		setFavorito((previousState) => !previousState);
-	};
 
 	const limparCampos = () => {
 		setNome('');
@@ -36,14 +45,42 @@ export default function Cadastro() {
 		setFavorito(false);
 	};
 
-	const handleCadastrar = () => {
-		addLocal(nome, data, descricao, despesa, url, favorito, () => {
-			getLocais((results) => setLocais(results));
-			limparCampos();
+	const addLocal = () => {
+		if (!nome) {
+			alert('Entre com o local');
+			return false;
+		}
+
+		db.transaction((txn) => {
+			txn.executeSql(
+				`INSERT INTO locais (nome, data, descricao, despesa, url, favorito) VALUES (?, ?, ?, ?, ?, ?)`,
+				[nome, data, descricao, despesa, url, 0],
+				(sqlTxn, res) => {
+					console.log(`${nome} adicionado com sucesso`);
+					getLocais();
+					limparCampos();
+				},
+				(error) => {
+					console.log(
+						`Nome: ${nome} | Data: ${data} | Descrição: ${descricao} | Despesa: ${despesa} | Url: ${url} | Favorito: 0`
+					);
+					console.log('Erro na inserção do local ' + error.message);
+				}
+			);
 		});
 	};
 
-	const renderLocais = ({ item }) => {
+	const getLocais = () => {
+		db.transaction((txn) => {
+			txn.executeSql(
+				`SELECT * FROM locais ORDER BY id DESC`,
+				[],
+				(_, { rows: { _array } }) => setLocais(_array)
+			);
+		});
+	};
+
+	const renderLocal = ({ item }) => {
 		return (
 			<View className='flex-1'>
 				<Text>{item.nome}</Text>
@@ -55,6 +92,11 @@ export default function Cadastro() {
 			</View>
 		);
 	};
+
+	useEffect(() => {
+		createTables();
+		getLocais();
+	}, []);
 
 	return (
 		<View className='flex-1 p-8'>
@@ -103,24 +145,26 @@ export default function Cadastro() {
 				keyboardType='default'
 				returnKeyType='next'
 			/>
-			<Text className='font-bold text-lg text-slate-800'>Favorito</Text>
-			<View className='flex-1 items-start'>
-				<Switch onValueChange={onToggleSwitch} value={favorito} />
-			</View>
+			{/* <Text className='font-bold text-lg text-slate-800'>Favorito</Text>
+			<TextInput
+				className='border-2 rounded-lg border-slate-800'
+				value={favorito}
+				onChangeText={setFavorito}
+				placeholder='local é favorito?'
+				keyboardType='default'
+				returnKeyType='done'
+			/> */}
+
 			<TouchableOpacity
-				onPress={handleCadastrar}
+				onPress={addLocal}
 				className='bg-blue-500 py-4 items-center rounded-xl'
 			>
 				<Text className='font-bold text-slate-50 uppercase text-base'>
 					Cadastrar
 				</Text>
 			</TouchableOpacity>
-			<FlatList
-				className='flex-1'
-				data={locais}
-				renderItem={renderLocais}
-				key={(cat) => cat.id}
-			/>
+
+			<FlatList data={locais} renderItem={renderLocal} key={(loc) => loc.id} />
 		</View>
 	);
 }

@@ -9,8 +9,12 @@ export default function Home() {
 			>
 				<View className='flex-1 justify-end'>
 					<View>
-						<Text className='text-slate-50 text-xs tracking-widest text-center uppercase'>Meu App</Text>
-						<Text className='text-slate-50 text-3xl font-bold tracking-tighter text-center uppercase'>Travel Indicator</Text>
+						<Text className='text-slate-50 text-xs tracking-widest text-center uppercase'>
+							Meu App
+						</Text>
+						<Text className='text-slate-50 text-3xl font-bold tracking-tighter text-center uppercase'>
+							Travel Indicator
+						</Text>
 					</View>
 				</View>
 			</ImageBackground>

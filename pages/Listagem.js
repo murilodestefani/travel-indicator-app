@@ -1,11 +1,5 @@
 import { useCallback, useState } from 'react';
-import {
-	FlatList,
-	Pressable,
-	Text,
-	View,
-	Image,
-} from 'react-native';
+import { FlatList, Pressable, Text, View, Image } from 'react-native';
 import { deleteLocal, getLocais } from '../lib/sqlite/queries';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';

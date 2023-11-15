@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Text, TextInput, Pressable, Switch } from 'react-native';
+import {
+	ScrollView,
+	View,
+	Text,
+	TextInput,
+	Pressable,
+	Switch,
+} from 'react-native';
 import { addLocal } from '../lib/sqlite/queries';
 
 export function Cadastro() {
